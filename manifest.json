@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "Riddle Lock",
+  "description": "A browser extension that shows a riddle after you've been on a site too long, helping you stay focused.",
+  "options_page":  "src/pages/options/index.html",
+  "icons": {
+    "128": "icon-128.png"
+  },
+  "permissions": ["storage"],
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*",
+        "<all_urls>"
+      ],
+      "js": [
+        "src/pages/content/index.tsx"
+      ]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "icon-128.png",
+        "icon-32.png"
+      ],
+      "matches": []
+    }
+  ]
+}
