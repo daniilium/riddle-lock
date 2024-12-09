@@ -6,6 +6,7 @@ import { local } from '@/lib/storage'
 
 chrome.runtime.onInstalled.addListener(async () => {
   console.log('onInstalled')
+
   const isFirstRun = await local.get('isFirstRun')
 
   const isNotFirstRun = Boolean(isFirstRun) && isFirstRun !== undefined
@@ -16,7 +17,7 @@ chrome.runtime.onInstalled.addListener(async () => {
 
   local.set('blackDomains', blackDomains)
 
-  // local.set('isFirstRun', true)
+  local.set('isFirstRun', true)
 })
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {

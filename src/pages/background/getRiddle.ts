@@ -1,10 +1,9 @@
-import { question } from './store'
+import { questions } from './store'
 import { local } from '@/lib/storage'
 
 export async function getRiddle(currentDomain: string) {
   const RIDDLE_COOLDOWN = await local.get('RIDDLE_COOLDOWN')
   const blackDomains = await local.get('blackDomains')
-  console.log('getRiddle', currentDomain, RIDDLE_COOLDOWN)
 
   // Проверка: есть ли домен в чёрном списке
   const domains = Object.keys(blackDomains)
@@ -19,27 +18,29 @@ export async function getRiddle(currentDomain: string) {
     return { isBlackDomain: true, isShowRiddle: false }
   }
 
-  // Отправляем загадку
-  return {
-    isBlackDomain: true,
-    isShowRiddle: true,
-    riddle: getQuestion(),
-  }
-}
-
-function getQuestion() {
-  const questionId = getRandomQuestionId()
-  const currentQuestion = question[questionId]
-
-  return {
+  // Получение случайной загадки
+  const questionId = getRandomIndexFromQuestions()
+  const currentQuestion = questions[questionId]
+  const riddle = {
     question: currentQuestion.question,
     options: shuffleArray(currentQuestion.options),
     answer: currentQuestion.answer,
   }
+
+  // Сохранение индекса вопроса в BlackDomains, чтобы потом проверить ответ
+  blackDomains[blackDomain].questionIndex = questionId
+  await local.set('blackDomains', blackDomains)
+
+  // Отправляем загадку
+  return {
+    isBlackDomain: true,
+    isShowRiddle: true,
+    riddle,
+  }
 }
 
-function getRandomQuestionId() {
-  const questionId = Math.floor(Math.random() * question.length)
+function getRandomIndexFromQuestions() {
+  const questionId = Math.floor(Math.random() * questions.length)
   return questionId
 }
 

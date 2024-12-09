@@ -1,14 +1,14 @@
 import { storage } from 'webextension-polyfill'
 
-type BlackDomain = {
+type BlackDomainEntity = {
   lastAnsweredAt: number
-  questionId: number
+  questionIndex: number
 }
 
 type LocalData = {
   isFirstRun?: boolean
   RIDDLE_COOLDOWN: number
-  blackDomains: Record<string, BlackDomain>
+  blackDomains: Record<string, BlackDomainEntity>
 }
 
 class CustomStorage {

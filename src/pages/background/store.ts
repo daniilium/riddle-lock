@@ -6,7 +6,7 @@ export const initTime = new Date().getTime() - RIDDLE_COOLDOWN
 export const blackDomains = {
   'https://example.com': {
     lastAnsweredAt: initTime,
-    questionId: 0,
+    questionIndex: 0,
   },
 }
 
@@ -29,7 +29,7 @@ const mathQuestion = [
   {
     question: '6 * 9 = ?',
     options: ['54', '45', '63', '49'],
-    answer: '63',
+    answer: '54',
   },
 ]
 
@@ -41,7 +41,7 @@ const russianRules = [
   },
 ]
 
-export const question = [
+export const questions = [
   {
     question: '2 + 2 = ?',
     options: ['4', '5', '6', '7'],

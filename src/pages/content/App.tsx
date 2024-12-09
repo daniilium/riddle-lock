@@ -18,8 +18,6 @@ export default function App() {
     let timerId: NodeJS.Timeout | null = null
 
     const fetchRiddle = async () => {
-      console.log('fetchRiddle')
-
       try {
         const currentUrl = window.location.href
         const response = await send('getRiddle', currentUrl)

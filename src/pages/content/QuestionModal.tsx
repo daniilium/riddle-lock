@@ -1,11 +1,11 @@
+import { useState } from 'react'
+
+import { Button } from '@/components/ui/button'
 import {
   AlertDialog,
   AlertDialogContent,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { Button } from '@/components/ui/button'
-
-import { useState } from 'react'
 
 import { send } from '@/lib/send'
 import { getRiddle } from '@/pages/background/getRiddle'
@@ -30,7 +30,7 @@ export default function QuestionModal(props: Props) {
     const currentUrl = window.location.href
     const response = await send('validateRiddleAnswer', {
       url: currentUrl,
-      answer,
+      userAnswer: answer,
     })
     let timeoutId = setTimeout(() => {}, 0)
 
@@ -55,13 +55,13 @@ export default function QuestionModal(props: Props) {
 
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-      <AlertDialogContent>
+      <AlertDialogContent className="z-[2147483647]">
         <AlertDialogTitle>Дай правильный ответ!</AlertDialogTitle>
 
         <TypographyH1>{props.riddle?.question}</TypographyH1>
 
         {isNoAnswer && (
-          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
             {props.riddle?.options.map((option) => (
               <Button
                 key={option}
