@@ -2,6 +2,7 @@
   "manifest_version": 3,
   "name": "Riddle Lock",
   "description": "A browser extension that shows a riddle after you've been on a site too long, helping you stay focused.",
+  "homepage_url": "https://github.com/daniilium/riddle-lock",
   "options_page":  "src/pages/options/index.html",
   "icons": {
     "128": "icon-128.png"
