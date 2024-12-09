@@ -1,6 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+
+import { local } from '@/lib/storage'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -13,19 +15,21 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 
-import { local } from '@/lib/storage'
-
-const formSchema = z.object({
-  blackDomains: z.array(z.string()).min(1),
-  newBlackDomain: z.string().url(),
-})
+const formSchema = z
+  .object({
+    blackDomains: z.array(z.string()).min(1),
+    newBlackDomain: z.string().min(11).url(),
+  })
+  .refine((data) => !data.blackDomains.includes(data.newBlackDomain), {
+    message: 'Domain already exists',
+    path: ['newBlackDomain'],
+  })
 
 export default function BlackDomainsForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: async () => {
       const blackDomains = await local.get('blackDomains')
-      console.log('blackDomains', blackDomains)
 
       return {
         blackDomains: Object.keys(blackDomains) as string[],
@@ -34,8 +38,21 @@ export default function BlackDomainsForm() {
     },
   })
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log('onSubmit values', values)
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    const domain = values.newBlackDomain
+    const updateBlackDomains = [...form.getValues('blackDomains'), domain]
+
+    form.setValue('blackDomains', updateBlackDomains)
+    form.setValue('newBlackDomain', '')
+
+    // work with extension storage
+    const riddleCooldown = await local.get('RIDDLE_COOLDOWN')
+    const storageBlackDomains = await local.get('blackDomains')
+    storageBlackDomains[domain] = {
+      lastAnsweredAt: new Date().getTime() - riddleCooldown,
+      questionIndex: -1,
+    }
+    await local.set('blackDomains', storageBlackDomains)
   }
 
   async function handleRemoveDomain(domain: string) {
@@ -48,26 +65,6 @@ export default function BlackDomainsForm() {
     // work with extension storage
     const storageBlackDomains = await local.get('blackDomains')
     delete storageBlackDomains[domain]
-    await local.set('blackDomains', storageBlackDomains)
-  }
-
-  async function handleAddDomain() {
-    const isValid = await form.trigger('newBlackDomain')
-    if (!isValid) return
-
-    const domain = form.getValues('newBlackDomain')
-    const updateBlackDomains = [...form.getValues('blackDomains'), domain]
-
-    form.setValue('blackDomains', updateBlackDomains)
-    form.setValue('newBlackDomain', '')
-
-    // work with extension storage
-    const riddleCooldown = await local.get('RIDDLE_COOLDOWN')
-    const storageBlackDomains = await local.get('blackDomains')
-    storageBlackDomains[domain] = {
-      lastAnsweredAt: new Date().getTime() - riddleCooldown,
-      questionId: 0,
-    }
     await local.set('blackDomains', storageBlackDomains)
   }
 
@@ -105,6 +102,7 @@ export default function BlackDomainsForm() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Add Black Domain</FormLabel>
+
               <div className="flex gap-2">
                 <FormControl>
                   <Input
@@ -114,9 +112,7 @@ export default function BlackDomainsForm() {
                   />
                 </FormControl>
 
-                <Button type="button" onClick={handleAddDomain}>
-                  Add
-                </Button>
+                <Button type="submit">Add</Button>
               </div>
 
               <FormDescription>Site starts with https://</FormDescription>
