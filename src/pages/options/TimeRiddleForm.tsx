@@ -56,7 +56,7 @@ export default function TimeRiddleForm() {
           name="riddleCooldown"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Время до загадки</FormLabel>
+              <FormLabel>Time to the Riddle</FormLabel>
 
               <div className="flex gap-2">
                 <FormControl>
@@ -65,7 +65,7 @@ export default function TimeRiddleForm() {
                 <Button type="submit">Submit</Button>
               </div>
 
-              <FormDescription>Укажите время в минутах</FormDescription>
+              <FormDescription>Specify time in minutes</FormDescription>
               <FormMessage />
             </FormItem>
           )}
