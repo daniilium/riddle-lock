@@ -1,29 +1,28 @@
 import { local } from '@/lib/storage'
-import { question } from './store'
+import { questions } from './store'
 
 export async function validateRiddleAnswer({
   url,
-  answer,
+  userAnswer,
 }: {
   url: string
-  answer: string
+  userAnswer: string
 }) {
-  const blackDomains = await local.get('blackDomains')
-  const domains = Object.keys(blackDomains)
-  const findDomain = domains.find((domain) =>
-    url.startsWith(domain)
-  ) as keyof typeof blackDomains
+  const storageBlackDomains = await local.get('blackDomains')
+  const allDomains = Object.keys(storageBlackDomains)
+  const domainKey = allDomains.find((d) =>
+    url.startsWith(d)
+  ) as keyof typeof storageBlackDomains
 
-  if (!findDomain) console.error('Домен не найден')
+  if (!domainKey) return console.error('Домен не найден')
 
-  const domain = blackDomains[findDomain]
+  const domainValue = storageBlackDomains[domainKey]
 
-  if (question[domain.questionId].answer !== answer) {
-    return { isAnswerCorrect: false }
-  }
+  const correctAnswer = questions[domainValue.questionIndex].answer
+  if (correctAnswer !== userAnswer) return { isAnswerCorrect: false }
 
-  blackDomains[findDomain].lastAnsweredAt = new Date().getTime()
-  await local.set('blackDomains', blackDomains)
+  storageBlackDomains[domainKey].lastAnsweredAt = new Date().getTime()
+  await local.set('blackDomains', storageBlackDomains)
 
   return { isAnswerCorrect: true }
 }
